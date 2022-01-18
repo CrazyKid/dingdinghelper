@@ -1,0 +1,9 @@
+ding:
+  webhook: https://oapi.dingtalk.com/robot/send?access_token=123
+  proxyIpList: "host1:123,host2:456"
+  #proxyIpList: "host1:port1"
+server:
+  port: 20000
+spring:
+  profiles:
+    active: test
