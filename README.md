@@ -1,26 +1,35 @@
 ##### 接入步骤：
-1. 引入依赖   
+###### 代码模块:
+如果选择引入jar包到自己项目:
+1. install 或者 deploy 本项目
+2. 引入依赖   
      ```xml
          <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>alibaba-dingtalk-service-sdk</artifactId>
-            <version>1.0.1</version>
+            <groupId>org.crazykid</groupId>
+            <artifactId>dingdinghelper</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
      ```
-2. 配置webhook 和 正向代理（非必填，不填时使用默认发送）   
+如果选择直接复制文件到自己项目:
+1. 拷贝DefaultProxyDingTalkClient,DingConfig,DingAlarmService,DefaultDingAlarmServiceImpl四个文件即可
+
+###### 配置模块:
+1. 配置application配置项   
     ```xml
     ding:
-        webhook: 钉钉机器人复制的webhook
-        proxyIpList: "host1:port1,host2:port2"
-        #proxyIpList: "host1:port1"
+      # 必填. 钉钉机器人地址
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=123
+      # 钉钉机器人配置时,填写的自定义关键词.如果配置机器人时填写了,这里必填
+      prefix: 支付网关
+      # 非必填. 正向代理的ip 和端口, 逗号分隔. 例如 proxyIpList: "host1:888888"
+      proxyIpList: "host1:123,host2:456"
+      # 非必填. 需要走代理的环境信息, 逗号分隔. 例如 proxyEnvList: "prod"
+      proxyEnvList: "pre,prod"
     ``` 
-3. 更改DingNotifyManager#DINGDING_PREFIX, 把前缀改成钉钉机器人配置的自定义关键词
-    ![钉钉机器人的配置](https://img-blog.csdnimg.cn/7f15ac859e3d4e8897f214870098b3ef.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAYWx3YXlzX25vb2I=,size_20,color_FFFFFF,t_70,g_se,x_16)
-
-
+![钉钉机器人配置时填写的自定义关键词](https://oss.getjing.cn/document/20220119/ding_prefix.png)
 
 ##### 使用：
 使用方法封装了三个较常用的
-1. 发送纯文本 DingNotifyManager#sendCleanText
-2. 发送带连接的通知 DingNotifyManager#sendLink
-3. 发送markdown格式通知 DingNotifyManager#sendMarkdown
+1. 发送纯文本 DingAlarmService#sendCleanText
+2. 发送带连接的通知 DingAlarmService#sendLink
+3. 发送markdown格式通知 DingAlarmService#sendMarkdown

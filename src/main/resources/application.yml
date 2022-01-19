@@ -1,7 +1,12 @@
 ding:
+  # 必填. 钉钉机器人地址
   webhook: https://oapi.dingtalk.com/robot/send?access_token=123
+  # 钉钉机器人配置时,填写的自定义关键词.如果配置机器人时填写了,这里必填
+  prefix: 支付网关
+  # 非必填. 正向代理的ip 和端口, 逗号分隔. 例如 proxyIpList: "host1:888888"
   proxyIpList: "host1:123,host2:456"
-  #proxyIpList: "host1:port1"
+  # 非必填. 需要走代理的环境信息, 逗号分隔. 例如 proxyEnvList: "prod"
+  proxyEnvList: "pre,prod"
 server:
   port: 20000
 spring:

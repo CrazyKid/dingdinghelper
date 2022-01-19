@@ -2,9 +2,12 @@ package com.crazykid.config;
 
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -20,15 +23,28 @@ import java.util.List;
 @ConfigurationProperties(prefix = "ding")
 @Configuration
 public class DingConfig {
+
+    private final Logger log = LoggerFactory.getLogger(DingConfig.class);
+
     /**
      * 机器人的链接地址
      */
     private String webhook;
 
     /**
+     * 消息中必须包含这个关键词,因为在创建机器人的时候配置了该关键词
+     */
+    private String prefix;
+
+    /**
      * 正向代理 地址加端口,逗号分隔
      */
     private String proxyIpList;
+
+    /**
+     * 正向代理 使用的环境信息,例如prod,pre, 逗号分隔
+     */
+    private String proxyEnvList;
 
     /**
      * 获取client
@@ -48,16 +64,40 @@ public class DingConfig {
     @Bean("proxy-ding-client")
     public DingTalkClient getProxyClient() {
         List<InetSocketAddress> proxyAddress = getProxyAddress();
-        // log.info("ding-notify-proxy-address:{}", proxyAddress);
+        log.info("ding-alarm-proxy-address:{}", proxyAddress);
         if (proxyAddress.isEmpty()) {
-            // log.info("cannot-create-proxy-ding-client, replace by default client");
+            log.info("cannot-create-proxy-ding-client, replace by default client");
             return getClient();
         }
+
         InetSocketAddress address = proxyAddress.get(0);
         Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
         DefaultProxyDingTalkClient client = new DefaultProxyDingTalkClient(webhook, proxy);
-        // log.info("create-proxy-ding-client, host:{}, port:{}", address.getHostString(), address.getPort());
+        log.info("create-proxy-ding-client, host:{}, port:{}", address.getHostString(), address.getPort());
         return client;
+    }
+
+    /**
+     * 获取配置中需要正向代理的环境信息
+     *
+     * @return
+     */
+    public List<String> getNeedProxyEnv() {
+        List<String> envList = new ArrayList<>();
+        String proxyEnvList = getProxyEnvList();
+        log.info("ding alarm proxy environment:{}", proxyEnvList);
+        if (StringUtils.isEmpty(proxyEnvList)) {
+            log.info("ding alarm proxy environment is empty. use default ding client always");
+            return envList;
+        }
+
+        String[] split = proxyEnvList.split(",");
+        for (String s : split) {
+            if (!StringUtils.isEmpty(s)) {
+                envList.add(s);
+            }
+        }
+        return envList;
     }
 
     /**
@@ -66,6 +106,7 @@ public class DingConfig {
      * @return
      */
     private List<InetSocketAddress> getProxyAddress() {
+        String proxyIpList = getProxyIpList();
         List<InetSocketAddress> list = new ArrayList<>();
         if (proxyIpList == null || proxyIpList.isEmpty()) {
             return list;
@@ -87,6 +128,14 @@ public class DingConfig {
         this.webhook = webhook;
     }
 
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
     public String getProxyIpList() {
         return proxyIpList;
     }
@@ -95,4 +144,11 @@ public class DingConfig {
         this.proxyIpList = proxyIpList;
     }
 
+    public String getProxyEnvList() {
+        return proxyEnvList;
+    }
+
+    public void setProxyEnvList(String proxyEnvList) {
+        this.proxyEnvList = proxyEnvList;
+    }
 }

@@ -1,8 +1,6 @@
 package com.crazykid.controller;
 
-import com.crazykid.config.DingConfig;
-import com.crazykid.config.DingNotifyManager;
-import org.springframework.beans.factory.annotation.Value;
+import com.crazykid.service.DingAlarmService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,7 +14,7 @@ import javax.annotation.Resource;
 public class TestController {
 
     @Resource
-    private DingNotifyManager dingNotifyManager;
+    private DingAlarmService dingAlarmService;
 
     @GetMapping("/health")
     public String healthy() {
@@ -26,10 +24,8 @@ public class TestController {
     @GetMapping("/notify")
     public String config() {
         // 请查看readme.md, 完成配置后在进行调用
-        dingNotifyManager.sendCleanText("alarm", true);
+        dingAlarmService.sendCleanText("alarm", true);
         return "invoked";
     }
-
-
 
 }
