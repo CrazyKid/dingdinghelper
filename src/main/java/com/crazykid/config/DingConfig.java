@@ -37,6 +37,11 @@ public class DingConfig {
     private String prefix;
 
     /**
+     * 默认艾特的手机号列表
+     */
+    private List<String> defaultAtPhoneList;
+
+    /**
      * 正向代理 地址加端口,逗号分隔
      */
     private String proxyIpList;
@@ -45,6 +50,13 @@ public class DingConfig {
      * 正向代理 使用的环境信息,例如prod,pre, 逗号分隔
      */
     private String proxyEnvList;
+
+    /**
+     * 是否强制开启at功能而不区分环境
+     * 如果null 或者 false,除预发和正式环境外不会有at功能.
+     * 如果true, 根据at all的入参 或者 at phone list决定是否有at功能
+     */
+    private Boolean atActionIgnoredEnvByForce;
 
     /**
      * 获取client
@@ -85,9 +97,9 @@ public class DingConfig {
     public List<String> getNeedProxyEnv() {
         List<String> envList = new ArrayList<>();
         String proxyEnvList = getProxyEnvList();
-        log.info("ding alarm proxy environment:{}", proxyEnvList);
+        log.debug("ding alarm proxy environment:{}", proxyEnvList);
         if (StringUtils.isEmpty(proxyEnvList)) {
-            log.info("ding alarm proxy environment is empty. use default ding client always");
+            log.debug("ding alarm proxy environment is empty. use default ding client always");
             return envList;
         }
 
@@ -136,6 +148,14 @@ public class DingConfig {
         this.prefix = prefix;
     }
 
+    public List<String> getDefaultAtPhoneList() {
+        return defaultAtPhoneList;
+    }
+
+    public void setDefaultAtPhoneList(List<String> defaultAtPhoneList) {
+        this.defaultAtPhoneList = defaultAtPhoneList;
+    }
+
     public String getProxyIpList() {
         return proxyIpList;
     }
@@ -150,5 +170,13 @@ public class DingConfig {
 
     public void setProxyEnvList(String proxyEnvList) {
         this.proxyEnvList = proxyEnvList;
+    }
+
+    public Boolean getAtActionIgnoredEnvByForce() {
+        return atActionIgnoredEnvByForce;
+    }
+
+    public void setAtActionIgnoredEnvByForce(Boolean atActionIgnoredEnvByForce) {
+        this.atActionIgnoredEnvByForce = atActionIgnoredEnvByForce;
     }
 }

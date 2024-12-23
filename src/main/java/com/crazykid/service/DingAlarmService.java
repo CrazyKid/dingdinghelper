@@ -1,5 +1,7 @@
 package com.crazykid.service;
 
+import java.util.List;
+
 /**
  * 钉钉消息发送封装
  * <a href="https://ding-doc.dingtalk.com/doc#/serverapi2/qf2nxq/d535db33">自定义机器人webhook</a>
@@ -17,6 +19,15 @@ public interface DingAlarmService {
      * @return 是否发送成功
      */
     boolean sendCleanText(String content, boolean atAll);
+
+    /**
+     * 按照手机号去艾特人 通知纯文本信息
+     *
+     * @param content 纯文本内容
+     * @param phoneList 要通知的人的手机号, 如果是null 或者empty, 只会有通知,不会at人
+     * @return
+     */
+    boolean sendCleanText(String content, List<String> phoneList);
 
     /**
      * 发送带连接的通知

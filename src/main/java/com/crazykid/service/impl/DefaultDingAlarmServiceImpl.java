@@ -12,11 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.net.Proxy;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -55,6 +57,20 @@ public class DefaultDingAlarmServiceImpl implements DingAlarmService {
      */
     private String getPrefix() {
         return Optional.ofNullable(dingConfig.getPrefix()).orElse("") + "-" + getCurrentEnv() + "-";
+    }
+
+    /**
+     * 是否是正式/预发环境
+     *
+     * @return
+     */
+    private boolean isPreOrProdEnv() {
+        String currentEnv = getCurrentEnv();
+        if (currentEnv == null) {
+            return false;
+        }
+        String env = currentEnv.toLowerCase();
+        return "pre".equals(env) || "prod".equals(env);
     }
 
     /**
@@ -121,9 +137,33 @@ public class DefaultDingAlarmServiceImpl implements DingAlarmService {
             text.setContent(getPrefix() + content);
             request.setText(text);
             OapiRobotSendRequest.At at = new OapiRobotSendRequest.At();
-            //按照手机号at
-            //        at.setAtMobiles(Arrays.asList("132xxxxxxxx"));
-            at.setIsAtAll(atAll);
+            if (Boolean.TRUE.equals(dingConfig.getAtActionIgnoredEnvByForce())) {
+                at.setIsAtAll(atAll);
+            } else {
+                at.setIsAtAll(isPreOrProdEnv() && atAll);
+            }
+            request.setAt(at);
+        });
+    }
+
+    @Override
+    public boolean sendCleanText(String content, List<String> phoneList) {
+        if (StringUtils.isEmpty(content)) {
+            return false;
+        }
+        return handlerAlarm(getClient(), (OapiRobotSendRequest request) -> {
+            request.setMsgtype("text");
+            OapiRobotSendRequest.Text text = new OapiRobotSendRequest.Text();
+            text.setContent(getPrefix() + content);
+            request.setText(text);
+
+            OapiRobotSendRequest.At at = new OapiRobotSendRequest.At();
+            at.setIsAtAll(false);
+            if (!CollectionUtils.isEmpty(phoneList)) {
+                if (Boolean.TRUE.equals(dingConfig.getAtActionIgnoredEnvByForce()) || isPreOrProdEnv()) {
+                    at.setAtMobiles(phoneList);
+                }
+            }
             request.setAt(at);
         });
     }
