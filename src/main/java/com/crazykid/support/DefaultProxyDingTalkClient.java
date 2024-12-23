@@ -1,4 +1,4 @@
-package com.crazykid.config;
+package com.crazykid.support;
 
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkConstants;
@@ -18,6 +18,15 @@ import java.util.Map;
  * @date 2022/1/18 8:14 下午
  */
 public class DefaultProxyDingTalkClient extends DefaultDingTalkClient {
+
+    public DefaultProxyDingTalkClient() {
+        super(null);
+        this.setProxy(null);
+    }
+
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
 
     public DefaultProxyDingTalkClient(String serverUrl, Proxy proxy) {
         super(serverUrl);
